@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
-
+import "./CesarCipher"
 import './App.css';
+import CesarCipher from "./CesarCipher";
 
 const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-const shift = 3;
 
 class App extends Component {
   state = {
     message: '',
+    shift: '',
     result: ''
   };
 
@@ -17,27 +18,23 @@ class App extends Component {
     })
   };
 
+  resetAll = () => {
+    this.setState({
+      message: '',
+      shift: '',
+      result: ''
+    })
+  };
+
   cipher = () => {
     const plainText = this.state.message;
-    let encodedText = "";
-    for(let i = 0; i < plainText.length; i++) {
-      const letter = plainText[i];
-      const index = alphabet.indexOf(letter);
-      if (index === -1) {
-        encodedText += letter;
-      } else {
-        const newIndex = index + shift;
-        let newLetter = alphabet[newIndex];
-        if (newLetter === undefined) {
-          let indexFromStart = newIndex - alphabet.length;
-          newLetter = alphabet[indexFromStart];
+    const shift = Number(this.state.shift || 0);
+    const cipher = new CesarCipher();
+    cipher.setAlphabet(alphabet);
+    cipher.setShift(shift);
+    const result = cipher.encode(plainText);
 
-        }
-        encodedText += newLetter;
-      }
-    }
-
-    this.setState({result: encodedText})
+    this.setState({result: result})
   };
 
   render() {
@@ -52,7 +49,16 @@ class App extends Component {
           value={this.state.message}
           onChange={this.inputChangeHandler}
         />
+        <input
+          required
+          type="number" min="1"
+          name="shift"
+          placeholder="Enter shift"
+          value={this.state.shift}
+          onChange={this.inputChangeHandler}
+        />
         <button onClick={this.cipher}>Encrypt</button>
+        <button onClick={this.resetAll}>Reset</button>
         <p>Result: </p>
         <span className="boxResult">{this.state.result}</span>
       </div>
